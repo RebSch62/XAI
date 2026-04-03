@@ -5,20 +5,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import accuracy_score, classification_report
-import captum
 from captum.attr import DeepLift
 import shap
-
-import seaborn as sns
 from collections import Counter
 import torch
 import torch.nn as nn
-
-import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import StandardScaler
 
 if __name__ == '__main__':
+
+    # Seed and find device
     np.random.seed(42)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -32,6 +29,8 @@ if __name__ == '__main__':
     # Importing data
     # ==================================================================
     print("\nIMPORTING DATA")
+
+    # Read data
     data = pd.read_csv(r"C:\Users\rebec\BCI\XAI\imu-hand-tremor-parkinsons.csv")
     print(data.head(5))
 
@@ -49,11 +48,8 @@ if __name__ == '__main__':
     # ==================================================================
     print("\nDATA INSPECTION")
 
+    # Counter to inspect balance
     counter = Counter(y)
-
-    X_train.shape
-    X_train.head()
-    X_test.shape
 
     plt.figure(figsize=(8,8))
     plt.bar(counter.keys(),counter.values(), color="dodgerblue")
@@ -69,6 +65,7 @@ if __name__ == '__main__':
     # Preprocessing
     # ==================================================================
     print("\nPREPROCESSING PHASE")
+
     # Apply a scaler
     scaler      = StandardScaler()
     X_train  = scaler.fit_transform(X_train)
@@ -96,6 +93,7 @@ if __name__ == '__main__':
     # ==================================================================
     print("\nINITIALISING MODEL")
 
+    # The MLP
     class Model(nn.Module):
         def __init__(self, in_dim, out_dim):
             super().__init__()
@@ -115,10 +113,8 @@ if __name__ == '__main__':
     in_dim = X_tr_t.shape[1] 
     out_dim = 3
 
-    # CAlling the model using GPU
+    # Calling the model using GPU
     model = Model(in_dim, out_dim).to(device)
-
-
 
     # Definition of criterion and optimiser
     criterion = nn.CrossEntropyLoss()
@@ -129,11 +125,9 @@ if __name__ == '__main__':
     # ==================================================================
     # Training
     # ==================================================================
-
     print("\nTRAINING PHASE")
-    print("Number of training samples:  ", len(train_dl.dataset))
-    print("Batches per epoch: ", len(train_dl))
 
+    # Defining training variables
     epoch_losses = []
     epoch_accuracies = []
     batch_size = 64
@@ -147,6 +141,7 @@ if __name__ == '__main__':
         train_correct = 0
         train_total = 0
 
+        # looping over the batches
         for X_batch, y_batch in train_dl:
 
             # Putting to GPU
@@ -169,7 +164,7 @@ if __name__ == '__main__':
         epoch_losses.append(train_loss / train_total)
         epoch_accuracies.append(train_correct / train_total)
 
-    # Save model
+    # Save model if initialising again
     # torch.save(model.state_dict(), 'saved_model.pth')
 
     # Load trained model        
@@ -303,6 +298,7 @@ if __name__ == '__main__':
     # Comparison DeepLift & Shap
     # =================================================
     print("\nCOMPARISON")
+
     # Calculating mean absolute values single class
     mean_abs_shap = np.abs(shap_values.values[:, :, class_idx]).mean(axis=0)  
     mean_abs_dl   = np.abs(attr_np).mean(axis=0) 
@@ -337,16 +333,11 @@ if __name__ == '__main__':
     print("Top SHAP feature:    ", feature_imps_shap[0])
     print("Top DeepLIFT feature:", feature_imps_dl[0])
 
-
-    # Comparison on agreement
+    # Comparison on agreement usign spearman
     from scipy.stats import spearmanr
     rho, p = spearmanr(mean_abs_shap, mean_abs_dl)
     print(f"Spearman rank correlation: ρ={rho:.4f}, p={p:.4f}")
 
-    model.eval()
-    with torch.no_grad():
-        y_pred = model(X_te_t.to(device)).argmax(dim=1).cpu().numpy()
-    print(f"Model accuracy: {accuracy_score(y_te_t.numpy(), y_pred):.4f}")
 
 
 
