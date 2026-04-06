@@ -80,12 +80,6 @@ if __name__ == '__main__':
     # Converting to DataLoader
     train_dl = DataLoader(TensorDataset(X_tr_t, y_tr_t), batch_size=64, shuffle=True)
 
-    # For testing the model separately, save the data
-    np.save('X_train_XAI.npy', X_train)
-    np.save('y_train_XAI.npy', y_train)
-    np.save('X_test_XAI.npy',  X_test)
-    np.save('y_test_XAI.npy',  y_test)
-
 
 
     # ==================================================================
@@ -243,12 +237,14 @@ if __name__ == '__main__':
     fig = plt.figure()
     shap.plots.waterfall(shap_values[i,:,class_idx])
     plt.show()
+    print("Corresponding label for sample 1: ", y_tr_t.data[0])
 
     # Second explanation class 1, i=1
     i = 1
     fig = plt.figure()
     shap.plots.waterfall(shap_values[i,:,class_idx])
     plt.show()
+    print("Corresponding label for sample 2: ", y_tr_t.data[1])
 
 
     # =================================================
@@ -266,29 +262,31 @@ if __name__ == '__main__':
     attr_np      = attributions.detach().cpu().numpy() 
 
     # Local explanation class=1, i=0
-    sorted_idx = np.argsort(attr_np[0])  
+    sorted_idx      = np.argsort(np.abs(attr_np[0]))          
     sorted_features = np.array(feature_names)[sorted_idx]
     sorted_values   = attr_np[0][sorted_idx]
 
     plt.figure(figsize=(8, 4))
-    plt.barh(sorted_features, sorted_values, color='crimson') 
+    plt.barh(sorted_features, sorted_values, color='crimson')
     plt.axvline(0, color='black', linewidth=0.8)
     plt.title("DeepLIFT feature attributions for a single example")
     plt.xlabel("Attribution score")
     plt.ylabel("Feature")
+    plt.tight_layout()
     plt.show()
 
     # Local explanation class=1,i=1
-    sorted_idx = np.argsort(attr_np[1])  
+    sorted_idx      = np.argsort(np.abs(attr_np[1]))          
     sorted_features = np.array(feature_names)[sorted_idx]
     sorted_values   = attr_np[1][sorted_idx]
 
     plt.figure(figsize=(8, 4))
-    plt.barh(sorted_features, sorted_values, color='crimson') 
+    plt.barh(sorted_features, sorted_values, color='crimson')
     plt.axvline(0, color='black', linewidth=0.8)
     plt.title("DeepLIFT feature attributions for a single example")
     plt.xlabel("Attribution score")
     plt.ylabel("Feature")
+    plt.tight_layout()
     plt.show()
 
 
