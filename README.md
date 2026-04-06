@@ -7,6 +7,6 @@ were substracted by 1 for simplicity, so, e.g., tremor severity 'Mild' went from
 
 # Use 
 Download the files that have been put in the repository. These include the code, the saved model path for reproducibility, and the dataset that was retreived from 
-https://www.kaggle.com/datasets/manahilsiddique/parkinsons-imu-tremor-severity-dataset. Change the file path in the XAI_CNN_COMPLETE.py path to your own directory.
+https://www.kaggle.com/datasets/manahilsiddique/parkinsons-imu-tremor-severity-dataset. Change the file path in the XAI_CNN_COMPLETE.py paths to your own directory.
 
 
