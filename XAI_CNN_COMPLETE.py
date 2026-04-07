@@ -21,8 +21,7 @@ if __name__ == '__main__':
 
     # Connect to GPU
     print(f"Using device: {device}")
-    print(torch.cuda.is_available())        
-    print(torch.cuda.get_device_name(0)) 
+    print(torch.cuda.is_available())     
 
     
     # ==================================================================
@@ -30,8 +29,8 @@ if __name__ == '__main__':
     # ==================================================================
     print("\nIMPORTING DATA")
 
-    # Read data
-    data = pd.read_csv(r"C:\Users\rebec\BCI\XAI\imu-hand-tremor-parkinsons.csv")
+    # Change path to own directory
+    data = pd.read_csv(r"C:\...\imu-hand-tremor-parkinsons.csv")
     print(data.head(5))
 
     # Acquire X and y
